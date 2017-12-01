@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://cdn.bootcss.com/weui/1.1.2/style/weui.css" rel="stylesheet">
+  <script src="https://files.jser.im/vue.js"></script>
+  <style>
+    * {
+      font-family: 苹方;
+    }
+
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 600px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+
+    #yellow {
+      background-color: rgb(12, 219, 185);
+      color: white;
+    }
+  </style>
+  <title>WELCOME</title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>WELCOME</h1>
+    <div class="weui-btn-area">
+      <a @click="signup" href="#" id="yellow" class="weui-btn weui-btn_default">我是新用户</a>
+    </div>
+    <div class="weui-btn-area">
+      <a @click="signin" href="#" class="weui-btn weui-btn_warn">我是老用户</a>
+    </div>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      methods: {
+        signup: function () {
+          location.href = '/signup.html';
+        },
+        signin: function () {
+          location.href = '/signin.html';
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

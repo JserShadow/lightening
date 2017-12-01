@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>主页</title>
+  <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.3/weui.min.js"></script>
+  <script src="https://files.jser.im/vue.js"></script>
+  <link href="https://cdn.bootcss.com/weui/1.1.2/style/weui.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/axios/0.17.1/axios.js"></script>
+  <script src="https://files.jser.im/jquery.js"></script>
+  <style>
+    * {
+      font-family: 苹方;
+    }
+
+    .weui-grids {
+      margin-top: 50px;
+    }
+
+    .weui-grid {
+      width: 200px;
+      height: 200px;
+      color: rgb(29, 252, 222)
+    }
+
+    .top {
+      width: 100%;
+      height: 50px;
+      background-color: #35495e;
+      color: white;
+      line-height: 50px;
+      text-align: center;
+      letter-spacing: 5px;
+      font-size: 20px;
+    }
+
+    #LedSlider {
+      display: none;
+    }
+
+    #ColorSlider {
+      display: none;
+    }
+
+    #sliderValue-red {
+      color: red;
+    }
+
+    #sliderValue-green {
+      color: rgb(30, 219, 30);
+    }
+
+    #sliderValue-blue {
+      color: rgb(45, 168, 240);
+    }
+
+    #showRGB {
+      width: 40px;
+      height: 40px;
+      border: 2px solid black;
+      background-color: rgb(127, 127, 127);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    #changeBtn {
+      width: 60px;
+      height: 30px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 80px;
+      background-color: rgb(4, 190, 2);
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="top">
+      功能列表
+    </div>
+    <div class="weui-cells weui-cells_form">
+      <div class="weui-cell weui-cell_switch">
+        <div class="weui-cell__bd">LED开关</div>
+        <div class="weui-cell__ft">
+          <input class="weui-switch" type="checkbox" :chcked="ledLightStatus" @click="toggleLed">
+        </div>
+      </div>
+      <div class="weui-cell weui-cell_switch">
+        <div class="weui-cell__bd">彩灯开关</div>
+        <div class="weui-cell__ft">
+          <input class="weui-switch" type="checkbox" :checked="rgbLightStatus" @click="toggleRgb">
+        </div>
+      </div>
+    </div>
+    <div id="LedSlider">
+      <h3>LED 亮度调节</h3>
+      <div class="weui-slider-box">
+        <div id="LEDslider" class="weui-slider">
+          <div class="weui-slider__inner">
+            <div class="weui-slider__track"></div>
+            <div class="weui-slider__handler"></div>
+          </div>
+        </div>
+        <div id="sliderValue" class="weui-slider-box__value"></div>
+      </div>
+    </div>
+    <div id="ColorSlider">
+      <h3>彩灯颜色调节</h3>
+      <div class="weui-slider-box">
+        <div id="slider-red" class="weui-slider">
+          <div class="weui-slider__inner">
+            <div class="weui-slider__track"></div>
+            <div class="weui-slider__handler"></div>
+          </div>
+        </div>
+        <div id="sliderValue-red" class="weui-slider-box__value">{{red}}</div>
+      </div>
+      <div class="weui-slider-box">
+        <div id="slider-green" class="weui-slider">
+          <div class="weui-slider__inner">
+            <div class="weui-slider__track"></div>
+            <div class="weui-slider__handler"></div>
+          </div>
+        </div>
+        <div id="sliderValue-green" class="weui-slider-box__value">{{green}}</div>
+      </div>
+      <div class="weui-slider-box">
+        <div id="slider-blue" class="weui-slider">
+          <div class="weui-slider__inner">
+            <div class="weui-slider__track"></div>
+            <div class="weui-slider__handler"></div>
+          </div>
+        </div>
+        <div id="sliderValue-blue" class="weui-slider-box__value">{{blue}}</div>
+      </div>
+      <div id="showRGB"></div>
+      <input id="changeBtn" type="button" value="change" @click="changeColor">
+    </div>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        ledLightStatus: false,
+        rgbLightStatus: false,
+        ipAddress: '',
+        red: 50,
+        green: 50,
+        blue: 50,
+      },
+      methods: {
+        toggleLed() {
+          this.ledLightStatus = !this.ledLightStatus;
+          if (this.ledLightStatus) {
+            $('#LedSlider').fadeIn(1000, function () {
+              console.log('fade in');
+              weui.slider('#LedSlider', {
+                step: 10,
+                defaultValue: 40,
+                onChange: function (percent) {
+                  var brightness = parseInt(255 * (percent / 100));
+                  axios.get('http://' + this.ipAddress + ':8084/pin?a=on&light=' + brightness);
+                }
+              });
+            })
+          } else {
+            $('#LedSlider').fadeOut(1000);
+          }
+        },
+        toggleRgb() {
+          this.rgbLightStatus = !this.rgbLightStatus;
+        },
+        changeColor() {
+          var self = this;
+          axios.get('http://'+self.ipAddress+':8084/color?red='+self.red+'&green='+self.green+'&blue='+self.blue);
+        }
+      },
+      watch: {
+        ledLightStatus: function () {
+          var self = this;
+          if (this.ledLightStatus) {
+            axios.get('http://' + this.ipAddress + ':8084/pin?a=on')
+          } else {
+            axios.get('http://' + this.ipAddress + ':8084/pin?a=off')
+          }
+        },
+        rgbLightStatus: function () {
+          if (this.rgbLightStatus) {
+            var self = this;
+            axios.get('http://' + this.ipAddress + ':8084/pin?a=on')
+            $('#ColorSlider').fadeIn(700, function () {
+              console.log('fade in');
+              weui.slider('#slider-red', {
+                step: 10,
+                defaultValue: 50,
+                onChange: function (percent) {
+                  self.red = parseInt(255*(percent/100));
+                  $('#showRGB').css('background-color','rgb('+self.red+','+self.green+','+self.blue+')');
+                }
+              });
+              weui.slider('#slider-green', {
+                step: 10,
+                defaultValue: 50,
+                onChange: function (percent) {
+                  self.green = parseInt(255*(percent/100));
+                  $('#showRGB').css('background-color','rgb('+self.red+','+self.green+','+self.blue+')');
+                }
+              });
+              weui.slider('#slider-blue', {
+                step: 10,
+                defaultValue: 50,
+                onChange: function (percent) {
+                  self.blue = parseInt(255*(percent/100));
+                  $('#showRGB').css('background-color','rgb('+self.red+','+self.green+','+self.blue+')');
+                }
+              });
+            })
+          } else {
+            axios.get('http://' + this.ipAddress + ':8084/pin?a=off')
+            $('#ColorSlider').fadeOut(700);
+          }
+        }
+      },
+      mounted: function () {
+        var self = this;
+        axios.get('/ip').then(function (res) {
+          self.ipAddress = res.data.ip;
+          console.log(self.ipAddress);
+        })
+      }
+    })
+  </script>
+</body>
+
+</html>
